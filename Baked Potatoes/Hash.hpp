@@ -54,9 +54,11 @@ namespace bpl
 				void Reset();
 
 				void Update(const void* Message, std::size_t Length);
+				void Update(const std::string& Message);
 
 				std::array<uint8_t, 20> Hash();
 				std::array<uint8_t, 20> Hash(const void* Message, std::size_t Length);
+				std::array<uint8_t, 20> Hash(const std::string& Message);
 
 				// In Bytes
 				static const std::size_t BlockSize = 64;
