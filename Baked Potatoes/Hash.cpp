@@ -175,6 +175,16 @@ namespace bpl
 			{
 				Context.reset(new Data);
 			}
+
+			inline void SHA1Context::Update(const std::string& Message)
+			{
+				Update(Message.c_str(), Message.length());
+			}
+
+			inline std::array<uint8_t, 20> SHA1Context::Hash(const std::string& Message)
+			{
+				return Hash(Message.c_str(), Message.length());
+			}
 		}
 	}
 }
