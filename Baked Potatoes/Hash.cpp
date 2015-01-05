@@ -2,8 +2,14 @@
 #include <cassert>
 #include <vector>
 #include <utility>
+#include <intrin.h>
 #include "Utility.hpp"
 #include "Counter.hpp"
+
+uint32_t htonl(uint32_t hostlong)
+{
+	return _byteswap_ulong(hostlong);
+}
 
 namespace bpl
 {
@@ -25,74 +31,62 @@ namespace bpl
 				return *this;
 			}
 
-			void SHA1Context::Update(const std::string& Message)
+			void SHA1Context::Update(const void* Message, std::size_t Length)
 			{
-				uint64_t MessageLength = Message.length();
-
-				if (!MessageLength)
+				if (!Length)
 					return;
 
-				Context->TotalLength += MessageLength * 8; // Total Length is in bits
-				auto MessageWords = ToWords(Message);
+				Context->TotalLength += Length * 8; // Total Length is in bits
 
-				if (MessageLength == 64)
+				if (Length == BlockSize && !Context->Buffer.second)
+					HashBlock(Message);
+				else if (Length + Context->Buffer.second > BlockSize)
 				{
-					assert(MessageWords.second.second == 0);
+					std::size_t Copied = BlockSize - Context->Buffer.second;
 
-					HashBlock(MessageWords.first);
+					std::memcpy(&(Context->Buffer.first.data()[Context->Buffer.second]), Message, Copied);
+					HashBuffer();
+
+					const uint8_t* Pointer = static_cast<const uint8_t*>(Message) + Copied;
+					while (Length - Copied >= 64)
+					{
+						HashBlock(Pointer);
+
+						Copied += 64;
+						Pointer += 64;
+					}
+
+					assert(Length - Copied >= 0);
+
+					if (Length - Copied)
+					{
+						std::memcpy(Context->Buffer.first.data(), Pointer, Length - Copied);
+						Context->Buffer.second = Length - Copied;
+					}
 				}
 				else
 				{
-					if (Context->SmallBuffer.second == 0)
-					{
-						Context->BigBuffer.splice(Context->BigBuffer.end(), MessageWords.first);
-						Context->SmallBuffer = std::move(MessageWords.second);
-					}
-					else
-					{
-						std::size_t Offset = 4 - Context->SmallBuffer.second;
-						Context->BigBuffer.push_back(Context->SmallBuffer.first | MessageWords.first.front() >> Offset * 8);
-
-						for (auto Iterator = std::next(MessageWords.first.begin()); Iterator != MessageWords.first.end(); ++Iterator)
-						{
-							Context->BigBuffer.push_back((*std::prev(Iterator) << Offset * 8) | (*Iterator >> Offset * 8));
-						}
-					}
-					HashFromBuffer();
+					std::memcpy(&(Context->Buffer.first.data()[Context->Buffer.second]), Message, Length);
+					Context->Buffer.second += Length;
 				}
 			}
 
 			std::array<uint8_t, 20> SHA1Context::Hash()
 			{
-				assert(Context->BigBuffer.size() < 16);
+				Context->Buffer.first[Context->Buffer.second++] = 0x80;
+				
+				// Total length won't fit; place it in the next block
+				if (Context->Buffer.second > 56)
+					HashBuffer();
 
-				if (Context->SmallBuffer.second != 0)
+				/*Context->Buffer.first[BlockSize - 1] = Context->TotalLength >> 32;
+				Context->Buffer.first[BlockSize] = Context->TotalLength & 0xffffffff;*/
+				for (int i = 7; i >= 0; --i)
 				{
-					Context->SmallBuffer.first |= 0x80 << (3 - Context->SmallBuffer.second++);
-					Context->BigBuffer.push_back(Context->SmallBuffer.first);
-				}
-				else
-					Context->BigBuffer.emplace_back(0x80000000);
-
-				if (Context->BigBuffer.size() > 14)
-				{
-					while (Context->BigBuffer.size() % 16 != 0)
-					{
-						Context->BigBuffer.emplace_back(0);
-					}
-
-					HashFromBuffer();
+					Context->Buffer.first[BlockSize - i - 1] = Context->TotalLength >> (i * 8);
 				}
 
-				while (Context->BigBuffer.size() % 16 != 14)
-					Context->BigBuffer.emplace_back(0);
-
-				Context->BigBuffer.push_back(Context->TotalLength >> 32);
-				Context->BigBuffer.push_back(Context->TotalLength & 0xffffffff);
-
-				assert(Context->BigBuffer.size() == 16);
-
-				HashBlock(Context->BigBuffer);
+				HashBuffer();
 
 				std::array<uint8_t, 20> Digest;
 				for (std::size_t i = 0; i < 20; ++i)
@@ -105,33 +99,26 @@ namespace bpl
 				return Digest;
 			}
 
-			std::array<uint8_t, 20> SHA1Context::Hash(const std::string& Message)
+			std::array<uint8_t, 20> SHA1Context::Hash(const void* Message, std::size_t Length)
 			{
-				Update(Message);
+				Update(Message, Length);
 
 				return Hash();
 			}
 
-			void SHA1Context::HashFromBuffer()
+			void SHA1Context::HashBuffer()
 			{
-				while (Context->BigBuffer.size() >= 16)
-				{
-					std::list<uint32_t> Block;
-					
-					if (Context->BigBuffer.size() == 16)
-						Block.splice(Block.begin(), Context->BigBuffer);
-					else
-						Block.splice(Block.begin(), Context->BigBuffer, Context->BigBuffer.begin(), std::next(Context->BigBuffer.begin(), 16));
-
-					HashBlock(Block);
-				}
+				HashBlock(Context->Buffer.first.data());
+				Context->Buffer.first.fill(0);
+				Context->Buffer.second = 0;
 			}
 
-			void SHA1Context::HashBlock(const std::list<uint32_t>& Block)
+			void SHA1Context::HashBlock(const void* Block)
 			{
 				std::array<uint32_t, 80> Words;
 				Words.fill(0);
-				std::copy(Block.begin(), Block.end(), Words.begin());
+				std::memcpy(Words.data(), Block, BlockSize);
+				std::transform(static_cast<const uint32_t*>(Block), static_cast<const uint32_t*>(Block) +16, Words.begin(), htonl);
 
 				for (std::size_t i = 16; i < 80; ++i)
 				{
@@ -187,30 +174,6 @@ namespace bpl
 			inline void SHA1Context::Reset()
 			{
 				Context.reset(new Data);
-			}
-
-			auto SHA1Context::ToWords(const std::string& Block) -> Buffer_t
-			{
-				BigBuffer_t Words;
-				Words.push_back(0);
-				SmallBuffer_t Residue;
-
-				auto WordsIterator = Words.begin();
-				Counter<std::size_t> Index(0, 3);
-				Index.SetCallback([&]() { Words.push_back(0); ++WordsIterator; });
-
-				for (auto BlockIterator = Block.begin(); BlockIterator != Block.end(); ++BlockIterator, ++Index)
-				{
-					*WordsIterator |= static_cast<uint8_t>(*BlockIterator) << ((3 - Index) * 8);
-				}
-			
-				Residue.second = Block.length() % 4;
-				if (Residue.second != 0)
-					Residue.first = Words.back();
-				
-				Words.pop_back();
-
-				return std::make_pair(Words, Residue);
 			}
 		}
 	}

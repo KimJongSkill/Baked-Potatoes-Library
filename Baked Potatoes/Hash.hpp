@@ -23,25 +23,24 @@ namespace bpl
 #ifdef UNIT_TESTING // Give the Test Class access
 				friend class ::LibraryTests::SHA1Test;
 #endif
-				using SmallBuffer_t = std::pair<std::uint32_t, std::size_t>;
-				using BigBuffer_t = std::list<uint32_t>;
-				using Buffer_t = std::pair<BigBuffer_t, SmallBuffer_t>;
-
+				
 				struct Data
 				{
 					std::array<uint32_t, 5> Result;
+					std::pair<std::array<uint8_t, 64>, std::size_t> Buffer;
 					uint64_t TotalLength = 0;
-					BigBuffer_t BigBuffer;
-					SmallBuffer_t SmallBuffer;
 
-					Data() : Result({ { 0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0 } }) {};
+					Data() : Result({ { 0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0 } }) 
+					{
+						Buffer.first.fill(0);
+						Buffer.second = 0;
+					};
 				};
 
 				std::unique_ptr<Data> Context;
 
-				void HashBlock(const BigBuffer_t& Block);
-				Buffer_t ToWords(const std::string& Block);
-				void HashFromBuffer();
+				void HashBlock(const void* Block);
+				void HashBuffer();
 
 			public:
 				SHA1Context();
@@ -54,10 +53,10 @@ namespace bpl
 
 				void Reset();
 
-				void Update(const std::string& Message);
+				void Update(const void* Message, std::size_t Length);
 
 				std::array<uint8_t, 20> Hash();
-				std::array<uint8_t, 20> Hash(const std::string& Message);
+				std::array<uint8_t, 20> Hash(const void* Message, std::size_t Length);
 
 				// In Bytes
 				static const std::size_t BlockSize = 64;

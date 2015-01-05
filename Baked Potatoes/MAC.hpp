@@ -23,7 +23,7 @@ namespace bpl
 					using bpl::utility::ByteToByteString;
 
 					if (Key.length() > Hash::BlockSize)
-						Key = ByteToByteString(Function.Hash(Key));
+						Key = ByteToByteString(Function.Hash(Key.c_str(), Key.length()));
 					else if (Key.length() < Hash::BlockSize)
 						Key.resize(Hash::BlockSize, 0x00);
 
@@ -34,9 +34,9 @@ namespace bpl
 					std::transform(Key.begin(), Key.end(), OutterKeyPad.begin(), [](std::string::value_type Byte) { return Byte ^ 0x5c; });
 
 					std::string InnerString = InnerKeyPad + Message;
-					auto InnerHash = Function.Hash(InnerString); // Uh oh
+					auto InnerHash = Function.Hash(InnerString.c_str(), InnerString.length()); // Uh oh
 					std::string InnerResult = ByteToByteString(InnerHash);
-					return Function.Hash(OutterKeyPad + InnerResult);
+					return Function.Hash((OutterKeyPad + InnerResult).c_str(), (OutterKeyPad + InnerResult).length());
 				}
 			};
 
