@@ -171,17 +171,17 @@ namespace bpl
 				Context->Result[4] += e;
 			}
 
-			inline void SHA1Context::Reset()
+			void SHA1Context::Reset()
 			{
 				Context.reset(new Data);
 			}
 
-			inline void SHA1Context::Update(const std::string& Message)
+			void SHA1Context::Update(const std::string& Message)
 			{
 				Update(Message.c_str(), Message.length());
 			}
 
-			inline std::array<uint8_t, 20> SHA1Context::Hash(const std::string& Message)
+			std::array<uint8_t, 20> SHA1Context::Hash(const std::string& Message)
 			{
 				return Hash(Message.c_str(), Message.length());
 			}
