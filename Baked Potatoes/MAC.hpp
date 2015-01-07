@@ -33,10 +33,7 @@ namespace bpl
 					std::transform(Key.begin(), Key.end(), InnerKeyPad.begin(), [](std::string::value_type Byte) { return Byte ^ 0x36; });
 					std::transform(Key.begin(), Key.end(), OutterKeyPad.begin(), [](std::string::value_type Byte) { return Byte ^ 0x5c; });
 
-					std::string InnerString = InnerKeyPad + Message;
-					auto InnerHash = Function.Hash(InnerString);
-					std::string InnerResult = ByteToByteString(InnerHash);
-					return Function.Hash(OutterKeyPad + InnerResult);
+					return Function.Hash(OutterKeyPad + ByteToByteString(Function.Hash(InnerKeyPad + Message)));
 				}
 			};
 
