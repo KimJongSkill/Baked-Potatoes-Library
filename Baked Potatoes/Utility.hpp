@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <array>
 #include <type_traits>
+#include <cstdlib>
 
 namespace bpl
 {
@@ -92,5 +93,17 @@ namespace bpl
 
 			return Stream.str();
 		}
+
+		uint64_t BigEndian64(uint64_t Value);
+
+		uint32_t BigEndian32(uint32_t Value);
+
+		uint16_t BigEndian16(uint16_t Value);
+
+		uint64_t LittleEndian64(uint64_t Value);
+
+		uint32_t LittleEndian32(uint32_t Value);
+
+		uint16_t LittleEndian16(uint16_t Value);
 	}
 }
