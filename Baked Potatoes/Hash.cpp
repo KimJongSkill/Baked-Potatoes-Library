@@ -6,11 +6,6 @@
 #include "Utility.hpp"
 #include "Counter.hpp"
 
-uint32_t htonl(uint32_t hostlong)
-{
-	return _byteswap_ulong(hostlong);
-}
-
 namespace bpl
 {
 	namespace crypt
@@ -118,7 +113,7 @@ namespace bpl
 				std::array<uint32_t, 80> Words;
 				Words.fill(0);
 				std::memcpy(Words.data(), Block, BlockSize);
-				std::transform(static_cast<const uint32_t*>(Block), static_cast<const uint32_t*>(Block) +16, Words.begin(), htonl);
+				std::transform(static_cast<const uint32_t*>(Block), static_cast<const uint32_t*>(Block) +16, Words.begin(), bpl::utility::BigEndian32);
 
 				for (std::size_t i = 16; i < 80; ++i)
 				{
