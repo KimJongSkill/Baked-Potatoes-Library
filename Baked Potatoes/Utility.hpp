@@ -105,5 +105,18 @@ namespace bpl
 		uint32_t LittleEndian32(uint32_t Value);
 
 		uint16_t LittleEndian16(uint16_t Value);
+
+		struct Uncopyable
+		{
+		protected:
+			Uncopyable() = default;
+			~Uncopyable() = default;
+
+			Uncopyable(Uncopyable&&);
+			const Uncopyable& operator=(Uncopyable&&);
+
+			Uncopyable(const Uncopyable&) = delete;
+			const Uncopyable& operator=(const Uncopyable&) = delete;
+		};
 	}
 }
