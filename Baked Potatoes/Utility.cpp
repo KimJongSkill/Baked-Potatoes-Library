@@ -46,9 +46,8 @@ namespace bpl
 			std::string Result;
 			Result.reserve(Array.length() * 2);
 
-			for (auto Character : Array)
+			for (uint8_t Byte : Array)
 			{
-				auto Byte = static_cast<std::uint8_t>(Character);
 				Result.push_back(LookUpTable[Byte >> 4]);
 				Result.push_back(LookUpTable[Byte & 0xf]);
 			}
