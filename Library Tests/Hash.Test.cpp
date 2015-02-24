@@ -31,9 +31,9 @@ namespace LibraryTests
 			std::string Test2 = "Test vector from febooti.com";
 			std::string Test3 = "";
 
-			Assert::AreEqual("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12", ToHex(SHA1.Hash(Test1.c_str(), Test1.length())).c_str());
-			Assert::AreEqual("a7631795f6d59cd6d14ebd0058a6394a4b93d868", ToHex(SHA1.Hash(Test2.c_str(), Test2.length())).c_str());
-			Assert::AreEqual("da39a3ee5e6b4b0d3255bfef95601890afd80709", ToHex(SHA1.Hash(Test3.c_str(), Test3.length())).c_str());
+			Assert::AreEqual("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12", SHA1.Hash(Test1.c_str(), Test1.length()).c_str());
+			Assert::AreEqual("a7631795f6d59cd6d14ebd0058a6394a4b93d868", SHA1.Hash(Test2.c_str(), Test2.length()).c_str());
+			Assert::AreEqual("da39a3ee5e6b4b0d3255bfef95601890afd80709", SHA1.Hash(Test3.c_str(), Test3.length()).c_str());
 		}
 
 		TEST_METHOD(ContextResetsOnHash)
@@ -71,9 +71,9 @@ namespace LibraryTests
 			std::string Test2 = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
 			std::string Test3(1000000, 'a');
 
-			Assert::AreEqual("a9993e364706816aba3e25717850c26c9cd0d89d", ToHex(SHA1.Hash(Test1.c_str(), Test1.length())).c_str());
-			Assert::AreEqual("84983e441c3bd26ebaae4aa1f95129e5e54670f1", ToHex(SHA1.Hash(Test2.c_str(), Test2.length())).c_str());
-			Assert::AreEqual("34aa973cd4c4daa4f61eeb2bdbad27316534016f", ToHex(SHA1.Hash(Test3.c_str(), Test3.length())).c_str());
+			Assert::AreEqual("a9993e364706816aba3e25717850c26c9cd0d89d", SHA1.Hash(Test1.c_str(), Test1.length()).c_str());
+			Assert::AreEqual("84983e441c3bd26ebaae4aa1f95129e5e54670f1", SHA1.Hash(Test2.c_str(), Test2.length()).c_str());
+			Assert::AreEqual("34aa973cd4c4daa4f61eeb2bdbad27316534016f", SHA1.Hash(Test3.c_str(), Test3.length()).c_str());
 		}
 	};
 }
