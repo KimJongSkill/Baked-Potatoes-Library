@@ -33,11 +33,11 @@ namespace bpl
 
 				Context->TotalLength += Length * 8; // Total Length is in bits
 
-				if (Length == BlockSize && !Context->Buffer.second)
+				if (Length == BlockSize() && !Context->Buffer.second)
 					HashBlock(Message);
-				else if (Length + Context->Buffer.second > BlockSize)
+				else if (Length + Context->Buffer.second > BlockSize())
 				{
-					std::size_t Copied = BlockSize - Context->Buffer.second;
+					std::size_t Copied = BlockSize() - Context->Buffer.second;
 
 					std::memcpy(&(Context->Buffer.first.data()[Context->Buffer.second]), Message, Copied);
 					HashBuffer();
@@ -66,7 +66,7 @@ namespace bpl
 				}
 			}
 
-			std::array<uint8_t, 20> SHA1Context::Hash()
+			std::string SHA1Context::Hash()
 			{
 				Context->Buffer.first[Context->Buffer.second++] = 0x80;
 				
@@ -74,16 +74,14 @@ namespace bpl
 				if (Context->Buffer.second > 56)
 					HashBuffer();
 
-				/*Context->Buffer.first[BlockSize - 1] = Context->TotalLength >> 32;
-				Context->Buffer.first[BlockSize] = Context->TotalLength & 0xffffffff;*/
 				for (int i = 7; i >= 0; --i)
 				{
-					Context->Buffer.first[BlockSize - i - 1] = Context->TotalLength >> (i * 8);
+					Context->Buffer.first[BlockSize() - i - 1] = (Context->TotalLength >> (i * 8)) & 0xff;
 				}
 
 				HashBuffer();
 
-				std::array<uint8_t, 20> Digest;
+				std::string Digest(DigestSize() / 8, 0);
 				for (std::size_t i = 0; i < 20; ++i)
 				{
 					Digest[i] = Context->Result[i / 4] >> ((3 - (i % 4)) * 8) & 0xff;
@@ -91,10 +89,10 @@ namespace bpl
 
 				Reset();
 
-				return Digest;
+				return bpl::utility::ToHex(Digest);
 			}
 
-			std::array<uint8_t, 20> SHA1Context::Hash(const void* Message, std::size_t Length)
+			std::string SHA1Context::Hash(const void* Message, std::size_t Length)
 			{
 				Update(Message, Length);
 
@@ -112,7 +110,7 @@ namespace bpl
 			{
 				std::array<uint32_t, 80> Words;
 				Words.fill(0);
-				std::memcpy(Words.data(), Block, BlockSize);
+				std::memcpy(Words.data(), Block, BlockSize());
 				std::transform(static_cast<const uint32_t*>(Block), static_cast<const uint32_t*>(Block) +16, Words.begin(), bpl::utility::BigEndian32);
 
 				for (std::size_t i = 16; i < 80; ++i)
@@ -176,9 +174,19 @@ namespace bpl
 				Update(Message.c_str(), Message.length());
 			}
 
-			std::array<uint8_t, 20> SHA1Context::Hash(const std::string& Message)
+			std::string SHA1Context::Hash(const std::string& Message)
 			{
 				return Hash(Message.c_str(), Message.length());
+			}
+
+			const std::size_t SHA1Context::BlockSize() const
+			{
+				return 64;
+			}
+
+			const std::size_t SHA1Context::DigestSize() const
+			{
+				return 160;
 			}
 		}
 	}
