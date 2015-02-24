@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <array>
 #include <string>
+#include <memory>
 #include "Hash.hpp"
 #include "Utility.hpp"
 
@@ -15,17 +16,17 @@ namespace bpl
 			template <class Hash>
 			class HMAC
 			{
-				Hash Function;
+				std::unique_ptr<bpl::crypt::hash::HashInterface> Function;
 
 			public:
-				std::array<std::uint8_t, Hash::DigestSize / 8> operator()(std::string Key, const  std::string& Message)
-				{
-					using bpl::utility::ByteToByteString;
+				HMAC() : Function(new Hash) {};
 
-					if (Key.length() > Hash::BlockSize)
-						Key = ByteToByteString(Function.Hash(Key));
-					if (Key.length() < Hash::BlockSize)
-						Key.resize(Hash::BlockSize, 0x00);
+				std::string operator()(std::string Key, const  std::string& Message)
+				{
+					if (Key.length() > Function->BlockSize())
+						Key = Function->Hash(Key, false);
+					if (Key.length() < Function->BlockSize())
+						Key.resize(Function->BlockSize(), 0x00);
 
 					std::string InnerKeyPad(64, 0x00);
 					std::string OutterKeyPad(64, 0x00);
@@ -33,7 +34,7 @@ namespace bpl
 					std::transform(Key.begin(), Key.end(), InnerKeyPad.begin(), [](std::string::value_type Byte) { return Byte ^ 0x36; });
 					std::transform(Key.begin(), Key.end(), OutterKeyPad.begin(), [](std::string::value_type Byte) { return Byte ^ 0x5c; });
 
-					return Function.Hash(OutterKeyPad + ByteToByteString(Function.Hash(InnerKeyPad + Message)));
+					return Function->Hash(OutterKeyPad + Function->Hash(InnerKeyPad + Message, false));
 				}
 			};
 

@@ -4,6 +4,7 @@
 #include <list>
 #include <memory>
 #include <tuple>
+#include "Utility.hpp"
 
 #ifdef UNIT_TESTING // Used for Unit Testing
 namespace LibraryTests
@@ -18,7 +19,25 @@ namespace bpl
 	{
 		namespace hash
 		{
-			class SHA1Context
+			class HashInterface : public bpl::utility::Uncopyable
+			{
+			public:
+				virtual ~HashInterface() = default;
+
+				virtual void Reset() = 0;
+
+				virtual void Update(const void* Message, std::size_t Length) = 0;
+				virtual void Update(const std::string& Message) = 0;
+
+				virtual std::string Hash(bool ReturnHex = true) = 0;
+				virtual std::string Hash(const void* Message, std::size_t Length, bool ReturnHex = true) = 0;
+				virtual std::string Hash(const std::string& Message, bool ReturnHex = true) = 0;
+
+				virtual const std::size_t BlockSize() const = 0; // In Bytes
+				virtual const std::size_t DigestSize() const = 0; // In Bits
+			};
+
+			class SHA1Context : public HashInterface
 			{
 #ifdef UNIT_TESTING // Give the Test Class access
 				friend class ::LibraryTests::SHA1Test;
@@ -45,26 +64,20 @@ namespace bpl
 			public:
 				SHA1Context();
 
-				SHA1Context(const SHA1Context&) = delete;
-				SHA1Context operator=(const SHA1Context&) = delete;
-
 				SHA1Context(SHA1Context&&);
 				SHA1Context& operator=(SHA1Context&&);
 
-				void Reset();
+				void Reset() override;
 
-				void Update(const void* Message, std::size_t Length);
-				void Update(const std::string& Message);
+				void Update(const void* Message, std::size_t Length) override;
+				void Update(const std::string& Message) override;
 
-				std::array<uint8_t, 20> Hash();
-				std::array<uint8_t, 20> Hash(const void* Message, std::size_t Length);
-				std::array<uint8_t, 20> Hash(const std::string& Message);
+				std::string Hash(bool ReturnHex = true) override;
+				std::string Hash(const void* Message, std::size_t Length, bool ReturnHex = true) override;
+				std::string Hash(const std::string& Message, bool ReturnHex = true) override;
 
-				// In Bytes
-				static const std::size_t BlockSize = 64;
-
-				// In Bits
-				static const std::size_t DigestSize = 160;
+				const std::size_t BlockSize() const override; // In Bytes
+				const std::size_t DigestSize() const override; // In Bits
 			};
 		}
 	}
