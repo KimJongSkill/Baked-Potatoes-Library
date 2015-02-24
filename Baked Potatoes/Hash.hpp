@@ -29,9 +29,9 @@ namespace bpl
 				virtual void Update(const void* Message, std::size_t Length) = 0;
 				virtual void Update(const std::string& Message) = 0;
 
-				virtual std::string Hash() = 0;
-				virtual std::string Hash(const void* Message, std::size_t Length) = 0;
-				virtual std::string Hash(const std::string& Message) = 0;
+				virtual std::string Hash(bool ReturnHex = true) = 0;
+				virtual std::string Hash(const void* Message, std::size_t Length, bool ReturnHex = true) = 0;
+				virtual std::string Hash(const std::string& Message, bool ReturnHex = true) = 0;
 
 				virtual const std::size_t BlockSize() const = 0; // In Bytes
 				virtual const std::size_t DigestSize() const = 0; // In Bits
@@ -72,9 +72,9 @@ namespace bpl
 				void Update(const void* Message, std::size_t Length) override;
 				void Update(const std::string& Message) override;
 
-				std::string Hash() override;
-				std::string Hash(const void* Message, std::size_t Length) override;
-				std::string Hash(const std::string& Message) override;
+				std::string Hash(bool ReturnHex = true) override;
+				std::string Hash(const void* Message, std::size_t Length, bool ReturnHex = true) override;
+				std::string Hash(const std::string& Message, bool ReturnHex = true) override;
 
 				const std::size_t BlockSize() const override; // In Bytes
 				const std::size_t DigestSize() const override; // In Bits
