@@ -19,6 +19,8 @@ namespace bpl
 				std::unique_ptr<bpl::crypt::hash::HashInterface> Function;
 
 			public:
+				using HashFunction = Hash;
+
 				HMAC() : Function(new Hash) {};
 
 				std::string operator()(std::string Key, const  std::string& Message)
