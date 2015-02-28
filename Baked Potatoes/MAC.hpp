@@ -23,10 +23,10 @@ namespace bpl
 
 				HMAC() : Function(new Hash) {};
 
-				std::string operator()(std::string Key, const  std::string& Message)
+				std::string operator()(std::string Key, const  std::string& Message, bool RawOutput = false)
 				{
 					if (Key.length() > Function->BlockSize())
-						Key = Function->Hash(Key, false);
+						Key = Function->Hash(Key, true);
 					if (Key.length() < Function->BlockSize())
 						Key.resize(Function->BlockSize(), 0x00);
 
@@ -36,7 +36,7 @@ namespace bpl
 					std::transform(Key.begin(), Key.end(), InnerKeyPad.begin(), [](std::string::value_type Byte) { return Byte ^ 0x36; });
 					std::transform(Key.begin(), Key.end(), OutterKeyPad.begin(), [](std::string::value_type Byte) { return Byte ^ 0x5c; });
 
-					return Function->Hash(OutterKeyPad + Function->Hash(InnerKeyPad + Message, false));
+					return Function->Hash(OutterKeyPad + Function->Hash(InnerKeyPad + Message, true), RawOutput);
 				}
 			};
 

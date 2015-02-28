@@ -66,7 +66,7 @@ namespace bpl
 				}
 			}
 
-			std::string SHA1Context::Hash(bool ReturnHex)
+			std::string SHA1Context::Hash(bool RawOutput)
 			{
 				Context->Buffer.first[Context->Buffer.second++] = 0x80;
 				
@@ -89,14 +89,14 @@ namespace bpl
 
 				Reset();
 
-				return ReturnHex ? bpl::utility::ToHex(Digest) : Digest;
+				return RawOutput ? Digest : bpl::utility::ToHex(Digest);
 			}
 
-			std::string SHA1Context::Hash(const void* Message, std::size_t Length, bool ReturnHex)
+			std::string SHA1Context::Hash(const void* Message, std::size_t Length, bool RawOutput)
 			{
 				Update(Message, Length);
 
-				return Hash(ReturnHex);
+				return Hash(RawOutput);
 			}
 
 			void SHA1Context::HashBuffer()
@@ -174,9 +174,9 @@ namespace bpl
 				Update(Message.c_str(), Message.length());
 			}
 
-			std::string SHA1Context::Hash(const std::string& Message, bool ReturnHex)
+			std::string SHA1Context::Hash(const std::string& Message, bool RawOutput)
 			{
-				return Hash(Message.c_str(), Message.length(), ReturnHex);
+				return Hash(Message.c_str(), Message.length(), RawOutput);
 			}
 
 			const std::size_t SHA1Context::BlockSize() const
