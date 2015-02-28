@@ -63,7 +63,7 @@ namespace LibraryTests
 			std::string Message2 = "what do ya want for nothing?";
 			std::string Key2 = "Jefe";
 
-			Assert::AreEqual("effcdf6ae5eb2fa2d27416d5f184df9c259a7c79",HMAC(Key2, Message2).c_str());
+			Assert::AreEqual("effcdf6ae5eb2fa2d27416d5f184df9c259a7c79", HMAC(Key2, Message2).c_str());
 
 			std::string Message3(50, 0xdd);
 			std::string Key3(20, 0xaa);
