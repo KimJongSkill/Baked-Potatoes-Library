@@ -38,6 +38,16 @@ namespace bpl
 
 					return Function->Hash(OutterKeyPad + Function->Hash(InnerKeyPad + Message, true), RawOutput);
 				}
+
+				std::size_t BlockSize() const // In Bytes
+				{
+					return Function->BlockSize();
+				}
+
+				std::size_t DigestSize() const // In Bits
+				{
+					return Function->DigestSize();
+				}
 			};
 
 			typedef HMAC<bpl::crypt::hash::SHA1Context> HMAC_SHA1;
