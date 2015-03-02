@@ -9,6 +9,7 @@ Feature list:
 - RDRAND Interface
 - SHA1
 - HMAC
+- PBKDF2
 - Math functions
 - Small object Pool
 - Mergesort
