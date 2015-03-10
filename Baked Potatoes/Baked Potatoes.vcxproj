@@ -125,7 +125,6 @@
     <ClCompile Include="Crypt.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Math.cpp" />
-    <ClCompile Include="Pixel.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
