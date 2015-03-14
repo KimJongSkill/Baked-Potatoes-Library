@@ -133,6 +133,7 @@
     <ClInclude Include="Counter.hpp" />
     <ClInclude Include="Crypt.hpp" />
     <ClInclude Include="Hash.hpp" />
+    <ClInclude Include="Image.hpp" />
     <ClInclude Include="MAC.hpp" />
     <ClInclude Include="Utility.hpp" />
     <ClInclude Include="Math.hpp" />
