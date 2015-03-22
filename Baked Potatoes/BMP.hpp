@@ -1,11 +1,10 @@
 #pragma once
 
 #include <vector>
-#include <fstream>
 #include <iterator>
 #include <iostream>
 #include <cstdint>
-#include "Pixel.hpp"
+#include "Image.hpp"
 
 namespace bpl
 {
@@ -13,9 +12,6 @@ namespace bpl
 	{
 		class BMP
 		{
-		public:
-			using pixel_type = Pixel24;
-			
 		private:
 			struct BitmapFileHeader
 			{
@@ -41,40 +37,16 @@ namespace bpl
 				uint32_t	ImportantColours;
 			} DIBHeader;
 
-			std::vector<std::vector<Pixel24>> PixelArray;
-			mutable std::fstream File;
-
 		public:
-			BMP(const std::string& Source);
+			template <class Pixel>
+			void DumpInfo(const Image<Pixel>& Object, std::ostream& Output = std::cout) const;
 
-			BMP(std::fstream&& Source);
+			template <class Pixel>
+			void Read(const std::string& Source, Image<Pixel>& Target);
 
-			BMP(const BMP& Other);
-
-			BMP(BMP&& Other);
-
-			BMP& operator=(const BMP& Other);
-
-			BMP& operator=(BMP&& Other);
-
-			std::size_t Size() const;
-
-			std::size_t PixelSize() const;
-
-			std::size_t Width() const;
+			template <class Pixel>
+			Image<Pixel> Read(const std::string& Source);
 			
-			std::size_t Height() const;
-
-			void Resize(std::size_t x, std::size_t y);
-
-			void DumpInfo(std::ostream& Output = std::cout) const;
-
-			Pixel24& operator()(std::size_t x, std::size_t y);
-
-			const Pixel24& operator()(std::size_t x, std::size_t y) const;
-
-			void Read();
-
 			void Write();
 
 		private:
@@ -87,9 +59,6 @@ namespace bpl
 
 			template <class Type>
 			void WriteToFile(Type& Variable) const;
-
-			template <>
-			void WriteToFile(Pixel24& Variable) const;
 
 			void CheckFile() const;
 

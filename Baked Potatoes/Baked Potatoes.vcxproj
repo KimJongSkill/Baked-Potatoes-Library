@@ -121,10 +121,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BMP.cpp" />
+    <ClCompile Include="BMP.cpp">
+      <FileType>CppCode</FileType>
+    </ClCompile>
     <ClCompile Include="Crypt.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="Pixel.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +135,7 @@
     <ClInclude Include="BMP.hpp" />
     <ClInclude Include="Counter.hpp" />
     <ClInclude Include="Crypt.hpp" />
+    <ClInclude Include="Defines.hpp" />
     <ClInclude Include="Hash.hpp" />
     <ClInclude Include="Image.hpp" />
     <ClInclude Include="MAC.hpp" />
