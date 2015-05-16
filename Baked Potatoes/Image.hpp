@@ -94,6 +94,8 @@ namespace bpl
 
 			std::size_t width() const
 			{
+				if (PixelArray.empty())
+					return 0;
 				return PixelArray.front().size();
 			}
 
