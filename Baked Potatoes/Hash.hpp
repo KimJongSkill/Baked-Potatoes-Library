@@ -6,13 +6,6 @@
 #include <tuple>
 #include "Utility.hpp"
 
-#ifdef UNIT_TESTING // Used for Unit Testing
-namespace LibraryTests
-{
-	class SHA1Test;
-}
-#endif
-
 namespace bpl
 {
 	namespace crypt
@@ -39,10 +32,6 @@ namespace bpl
 
 			class SHA1Context : public HashInterface
 			{
-#ifdef UNIT_TESTING // Give the Test Class access
-				friend class ::LibraryTests::SHA1Test;
-#endif
-				
 				struct Data
 				{
 					std::array<uint32_t, 5> Result;

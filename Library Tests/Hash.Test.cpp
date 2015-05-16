@@ -44,20 +44,6 @@ namespace LibraryTests
 			Assert::IsTrue(std::equal(First.begin(), First.end(), Second.begin()));
 		}
 
-		TEST_METHOD(BlockHashing)
-		{
-			std::array<uint8_t, 64> Words;
-			Words.fill(0);
-
-			SHA1.HashBlock(Words.data());
-
-			Assert::AreEqual((unsigned) 0x92b404e5, SHA1.Context->Result[0]);
-			Assert::AreEqual((unsigned) 0x56588ced, SHA1.Context->Result[1]);
-			Assert::AreEqual((unsigned) 0x6c1acd4e, SHA1.Context->Result[2]);
-			Assert::AreEqual((unsigned) 0xbf053f68, SHA1.Context->Result[3]);
-			Assert::AreEqual((unsigned) 0x09f73a93, SHA1.Context->Result[4]);
-		}
-
 		TEST_METHOD(Performance)
 		{
 			for (std::size_t i = 0; i < 10000; ++i)
