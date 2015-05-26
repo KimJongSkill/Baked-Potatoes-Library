@@ -22,6 +22,13 @@ namespace bpl
 			using array_type = std::vector<value_type>;
 			using data_type = std::vector<array_type>;
 
+			/* 
+			* To be expanded as support for more formats is hopefully added
+			* Allows the client code to query the file format of the image
+			* Virtual means the image was not loaded from a file
+			*/
+			enum class Format { Virtual, BMP };
+
 		private:
 			data_type PixelArray;
 
@@ -49,6 +56,11 @@ namespace bpl
 
 				if (!Extension.compare("bmp")) // Returns 0 when equal 
 					; // BMP load image
+			}
+
+			virtual Format GetFormat() const
+			{
+				return Format::Virtual;
 			}
 
 			Image(std::size_t x, std::size_t y)
