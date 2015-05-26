@@ -32,7 +32,7 @@ namespace LibraryTests
 	public:
 		TEST_METHOD_INITIALIZE(InitObject)
 		{
-			Object.resize(3, 2);
+			Object.Resize(3, 2);
 			
 			Object(0, 0) = { 255, 0, 0 };
 			Object(1, 0) = { 0, 255, 0 };
@@ -56,35 +56,35 @@ namespace LibraryTests
 
 		TEST_METHOD(Dimensions)
 		{
-			Assert::AreEqual(std::size_t(3), Object.width());
-			Assert::AreEqual(std::size_t(2), Object.height());
-			Assert::AreEqual(std::size_t(24), Object.depth());
-			Assert::AreEqual(std::size_t(6), Object.size());
+			Assert::AreEqual(std::size_t(3), Object.Width());
+			Assert::AreEqual(std::size_t(2), Object.Height());
+			Assert::AreEqual(std::size_t(24), Object.Depth());
+			Assert::AreEqual(std::size_t(6), Object.Size());
 		}
 
 		TEST_METHOD(Content)
 		{
-			Assert::IsFalse(Object.empty());
-			Object.clear();
-			Assert::IsTrue(Object.empty());
+			Assert::IsFalse(Object.Empty());
+			Object.Clear();
+			Assert::IsTrue(Object.Empty());
 		}
 
 		TEST_METHOD(Resize)
 		{
-			Object.resize(5, 1);
-			Assert::AreEqual(std::size_t(5), Object.width());
-			Assert::AreEqual(std::size_t(1), Object.height());
+			Object.Resize(5, 1);
+			Assert::AreEqual(std::size_t(5), Object.Width());
+			Assert::AreEqual(std::size_t(1), Object.Height());
 		}
 
 		TEST_METHOD(Apply)
 		{
-			Object.apply([&](Image<Pixel24>::const_reference x) { return Pixel24(x.Red % 64, x.Blue % 64, x.Green % 64); });
+			Object.Apply([&](Image<Pixel24>::const_reference x) { return Pixel24(x.Red % 64, x.Blue % 64, x.Green % 64); });
 			Assert::AreEqual(Pixel24(63, 63, 63), Object(1, 1));
 		}
 
 		TEST_METHOD(Fill)
 		{
-			Object.fill(Pixel24(42, 69, 7));
+			Object.Fill(Pixel24(42, 69, 7));
 			Assert::AreEqual(Pixel24(42, 69, 7), Object.at(1, 0));
 		}
 
@@ -95,34 +95,34 @@ namespace LibraryTests
 			Image<Pixel24> Temp(5, 5);
 			swap(Temp, Object);
 
-			Assert::AreEqual(std::size_t(3), Temp.width());
-			Assert::AreEqual(std::size_t(2), Temp.height());
-			Assert::AreEqual(std::size_t(5), Object.width());
-			Assert::AreEqual(std::size_t(5), Object.height());
+			Assert::AreEqual(std::size_t(3), Temp.Width());
+			Assert::AreEqual(std::size_t(2), Temp.Height());
+			Assert::AreEqual(std::size_t(5), Object.Width());
+			Assert::AreEqual(std::size_t(5), Object.Height());
 		}
 
 		TEST_METHOD(Flip)
 		{
 			Image<Pixel24> Original(Object);
 
-			Object.flip(bpl::Axis::x);
-			Object.flip(bpl::Axis::x);
-			for (std::size_t y = 0; y < Object.height(); ++y)
-				for (std::size_t x = 0; x < Object.width(); ++x)
+			Object.Flip(bpl::Axis::x);
+			Object.Flip(bpl::Axis::x);
+			for (std::size_t y = 0; y < Object.Height(); ++y)
+				for (std::size_t x = 0; x < Object.Width(); ++x)
 					Assert::AreEqual(Original(x, y), Object(x, y));
 
-			Object.flip(bpl::Axis::y);
-			Object.flip(bpl::Axis::y);
-			for (std::size_t y = 0; y < Object.height(); ++y)
-				for (std::size_t x = 0; x < Object.width(); ++x)
+			Object.Flip(bpl::Axis::y);
+			Object.Flip(bpl::Axis::y);
+			for (std::size_t y = 0; y < Object.Height(); ++y)
+				for (std::size_t x = 0; x < Object.Width(); ++x)
 					Assert::AreEqual(Original(x, y), Object(x, y));
 
-			Assert::ExpectException<std::out_of_range>(std::bind(&Image<Pixel24>::flip, &Object, bpl::Axis::z));
+			Assert::ExpectException<std::out_of_range>(std::bind(&Image<Pixel24>::Flip, &Object, bpl::Axis::z));
 		}
 
 		TEST_METHOD(Mirror)
 		{
-			Object.resize(3, 1);
+			Object.Resize(3, 1);
 
 			Image<Pixel24> ExpectedX(3, 2);
 			ExpectedX(0, 0) = { 255, 0, 0 };
@@ -140,15 +140,15 @@ namespace LibraryTests
 			ExpectedY(4, 0) = { 0, 255, 0 };
 			ExpectedY(5, 0) = { 255, 0, 0 };
 			
-			Object.mirror(bpl::Axis::x);
+			Object.Mirror(bpl::Axis::x);
 			Assert::IsTrue(Object == ExpectedX);
 			
-			Object.resize(3, 1);
+			Object.Resize(3, 1);
 
-			Object.mirror(bpl::Axis::y);
+			Object.Mirror(bpl::Axis::y);
 			Assert::IsTrue(Object == ExpectedY);
 
-			Assert::ExpectException<std::out_of_range>(std::bind(&Image<Pixel24>::mirror, &Object, bpl::Axis::z));
+			Assert::ExpectException<std::out_of_range>(std::bind(&Image<Pixel24>::Mirror, &Object, bpl::Axis::z));
 		}
 
 		TEST_METHOD(Rotate)
@@ -179,15 +179,15 @@ namespace LibraryTests
 			Expected270(0, 2) = { 255, 0, 0 };
 			Expected270(1, 2) = { 255, 255, 255 };
 
-			Clone.rotate(bpl::Rotation::_90);
+			Clone.Rotate(bpl::Rotation::_90);
 			Assert::IsTrue(Clone == Expected90, L"(90 degrees)");
 
 			Clone = Object;
-			Clone.rotate(bpl::Rotation::_180);
+			Clone.Rotate(bpl::Rotation::_180);
 			Assert::IsTrue(Clone == Expected180, L"(180 degrees)");
 			
 			Clone = Object;
-			Clone.rotate(bpl::Rotation::_270);
+			Clone.Rotate(bpl::Rotation::_270);
 			Assert::IsTrue(Clone == Expected270, L"(270 degrees)");
 		}
 

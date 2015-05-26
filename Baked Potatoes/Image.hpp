@@ -65,7 +65,7 @@ namespace bpl
 
 			Image(std::size_t x, std::size_t y)
 			{
-				resize(x, y);
+				Resize(x, y);
 			}
 
 			Image(const Image<value_type>& Other) = default;
@@ -96,112 +96,97 @@ namespace bpl
 
 			const_reference at(std::size_t x, std::size_t y) const
 			{
-				if (x > width() - 1)
+				if (x > Width() - 1)
 					throw std::out_of_range("Width is out of bounds");
-				if (y > height() - 1)
+				if (y > Height() - 1)
 					throw std::out_of_range("Height is out of bounds");
 
 				return operator()(x, y);
 			}
 
-			std::size_t width() const
+			std::size_t Width() const
 			{
 				if (PixelArray.empty())
 					return 0;
 				return PixelArray.front().size();
 			}
 
-			std::size_t height() const
+			std::size_t Height() const
 			{
 				return PixelArray.size();
 			}
 
-			std::size_t depth() const
+			std::size_t Depth() const
 			{
 				return value_type::Depth;
 			}
 
-			std::size_t size() const
+			std::size_t Size() const
 			{
-				return width() * height();
+				return Width() * Height();
 			}
 
-			bool empty() const
+			bool Empty() const
 			{
 				return PixelArray.empty();
 			}
 
-			void clear()
+			void Clear()
 			{
 				PixelArray.clear();
 			}
 
-			data_type* data()
+			data_type* Data()
 			{
 				return &PixelArray;
 			}
 
-			const data_type* data() const
+			const data_type* Data() const
 			{
 				return &PixelArray;
 			}
 
-			void resize(std::size_t x, std::size_t y)
+			void Resize(std::size_t x, std::size_t y)
 			{
 				PixelArray.resize(y);
 				std::for_each(PixelArray.begin(), PixelArray.end(), [&](array_type& i) { i.resize(x); });
 			}
 
-			void apply(std::function<value_type(const_reference)> Function)
+			void Apply(std::function<value_type(const_reference)> Function)
 			{
 				for (auto& i : PixelArray)
 					std::transform(i.begin(), i.end(), i.begin(), Function);
 			}
 
-			void fill(const_reference Pixel)
+			void Fill(const_reference Pixel)
 			{
 				for (auto& i : PixelArray)
 					for (auto& j : i)
 						j = Pixel;
 			}
 
-			void mirror(bpl::Axis Axis)
+			void Mirror(bpl::Axis Axis)
 			{
 				//Calls to std::vector<T>::reserve guarantee that our iterators are not invalidated
 
 				if (Axis == bpl::Axis::x)
 				{
-					/*resize(width(), height() * 2);
-
-					for (std::size_t i = 0; i < height() / 2; ++i)
-					{
-						PixelArray[height() - i] = PixelArray[i];
-					}*/
-
-					PixelArray.reserve(height() * 2);
-					/*for (auto i = PixelArray.crbegin(); i != PixelArray.crend(); ++i)
-					{
-					PixelArray.push_back(*i);
-					}*/
-					if (height() > 1)
+					PixelArray.reserve(Height() * 2);
+					if (Height() > 1)
 						std::for_each(PixelArray.crbegin(), PixelArray.crend(), [&](const array_type& i) { PixelArray.push_back(i); });
 					else
 						PixelArray.push_back(PixelArray.front());
 				}
 				else if (Axis == bpl::Axis::y)
 				{
-					//resize(width() * 2, height());
-
 					for (auto& i : PixelArray)
 					{
-						i.reserve(width() * 2);
+						i.reserve(Width() * 2);
 						for (std::ptrdiff_t j = i.size() - 1; j >= 0; --j)
 						{
 							i.push_back(i[j]);
 						}
 					}
-					/*std::for_each(PixelArray.begin(), PixelArray.end(), std::bind(&array_type::reserve, std::placeholders::_1, width() * 2));
-					std::for_each(PixelArray.begin(), PixelArray.end(), [&](array_type& i) { std::for_each(i.crbegin(), i.crend(), [&](const value_type& j) { i.push_back(j); }); });*/
 				}
 				else
 				{
@@ -209,24 +194,24 @@ namespace bpl
 				}
 			}
 
-			void flip(bpl::Axis Axis)
+			void Flip(bpl::Axis Axis)
 			{
 				using std::swap;
 
 				if (Axis == bpl::Axis::x)
 				{
-					for (std::size_t y = 0; y < height(); ++y)
+					for (std::size_t y = 0; y < Height(); ++y)
 					{
-						swap(PixelArray[y], PixelArray[height() - y - 1]); // Height returns a one-based index
+						swap(PixelArray[y], PixelArray[Height() - y - 1]); // Height returns a one-based index
 					}
 				}
 				else if (Axis == bpl::Axis::y)
 				{
-					for (std::size_t y = 0; y < height(); ++y)
+					for (std::size_t y = 0; y < Height(); ++y)
 					{
-						for (std::size_t x = 0; x < width(); ++x)
+						for (std::size_t x = 0; x < Width(); ++x)
 						{
-							swap(this->operator()(x, y), this->operator()(width() - x - 1, y)); // Width returns a one-based index
+							swap(this->operator()(x, y), this->operator()(Width() - x - 1, y)); // Width returns a one-based index
 						}
 					}
 				}
@@ -236,7 +221,7 @@ namespace bpl
 				}
 			}
 
-			void rotate(bpl::Rotation Degrees)
+			void Rotate(bpl::Rotation Degrees)
 			{
 				using std::swap;
 
@@ -248,30 +233,30 @@ namespace bpl
 				switch (Degrees)
 				{
 					case bpl::Rotation::_90:
-						xFunction = [this](std::size_t x, std::size_t y) { return height() - 1 - y; };
+						xFunction = [this](std::size_t x, std::size_t y) { return Height() - 1 - y; };
 						yFunction = [this](std::size_t x, std::size_t y) { return x; };
-						NewWidth = height();
-						NewHeight = width();
+						NewWidth = Height();
+						NewHeight = Width();
 						break;
 					case bpl::Rotation::_180:
-						xFunction = [this](std::size_t x, std::size_t y) { return width() - 1 - x; };
-						yFunction = [this](std::size_t x, std::size_t y) { return height() - 1 - y; };
-						NewWidth = width();
-						NewHeight = height();
+						xFunction = [this](std::size_t x, std::size_t y) { return Width() - 1 - x; };
+						yFunction = [this](std::size_t x, std::size_t y) { return Height() - 1 - y; };
+						NewWidth = Width();
+						NewHeight = Height();
 						break;
 					case bpl::Rotation::_270:
 						xFunction = [this](std::size_t x, std::size_t y) { return y; };
-						yFunction = [this](std::size_t x, std::size_t y) { return width() - 1 - x; };
-						NewWidth = height();
-						NewHeight = width();
+						yFunction = [this](std::size_t x, std::size_t y) { return Width() - 1 - x; };
+						NewWidth = Height();
+						NewHeight = Width();
 						break;
 				}
 
 				Image<value_type> Temp(NewWidth, NewHeight);
 
-				for (std::size_t y = 0; y < height(); ++y)
+				for (std::size_t y = 0; y < Height(); ++y)
 				{
-					for (std::size_t x = 0; x < width(); ++x)
+					for (std::size_t x = 0; x < Width(); ++x)
 					{
 						Temp(xFunction(x, y), yFunction(x, y)) = this->operator()(x, y);
 					}
@@ -285,13 +270,13 @@ namespace bpl
 				if (this == &Other)
 					return true;
 
-				if (width() != Other.width())
+				if (Width() != Other.Width())
 					return false;
-				if (height() != Other.height())
+				if (Height() != Other.Height())
 					return false;
 
-				for (std::size_t y = 0; y < height(); ++y)
-					for (std::size_t x = 0; x < width(); ++x)
+				for (std::size_t y = 0; y < Height(); ++y)
+					for (std::size_t x = 0; x < Width(); ++x)
 						if (this->operator()(x, y) != Other(x, y))
 							return false;
 
