@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2013 for Windows Desktop
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Baked Potatoes", "Baked Potatoes\Baked Potatoes.vcxproj", "{1565888F-90CB-4FE1-821F-49D76C436AB9}"
 EndProject
@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Library Tests", "Library Te
 	ProjectSection(ProjectDependencies) = postProject
 		{1565888F-90CB-4FE1-821F-49D76C436AB9} = {1565888F-90CB-4FE1-821F-49D76C436AB9}
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{95023F9F-3C7B-4B1C-AA9D-F0D283C60D5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,7 @@ Global
 		{170DC419-6754-484E-8866-62924C708662}.Release|Win32.ActiveCfg = Release|Win32
 		{170DC419-6754-484E-8866-62924C708662}.Release|Win32.Build.0 = Release|Win32
 		{170DC419-6754-484E-8866-62924C708662}.Release|x64.ActiveCfg = Release|x64
+		{170DC419-6754-484E-8866-62924C708662}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
