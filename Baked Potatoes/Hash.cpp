@@ -20,7 +20,7 @@ namespace bpl
 			{
 				if (this != &Other)
 				{
-					Context.reset(Other.Context.release());;
+					Context.reset(Other.Context.release());
 				}
 
 				return *this;
