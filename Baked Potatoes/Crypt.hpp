@@ -39,14 +39,25 @@ namespace bpl
 			bool operator()(Iterator Begin, Iterator End)
 			{
 				std::ptrdiff_t Distance = std::distance(Begin, End) * sizeof(*Begin);
+#ifdef ENVIROMENT64
 				std::vector<uint64_t> Buffer;
-				Buffer.resize((Distance + 7) / 8);
+				Buffer.resize((Distance + 7) / sizeof(uint64_t));
 
 				for (uint64_t& i : Buffer)
 				{
 					if (!_rdrand64_step(&i))
 						return false;
 				}
+#else
+				std::vector<uint32_t> Buffer;
+				Buffer.resize((Distance + 7) / sizeof(uint32_t));
+
+				for (uint32_t& i : Buffer)
+				{
+					if (!_rdrand32_step(&i))
+						return false;
+				}
+#endif
 
 				std::memcpy(&*Begin, &Buffer.front(), Distance);
 				return true;

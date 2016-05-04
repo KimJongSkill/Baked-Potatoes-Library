@@ -3,21 +3,22 @@
 #include <cstring>
 
 // Required wrappers so we can take their address
-
-int RDRAND16(unsigned short* Value)
+int RDRAND16(uint16_t* Value)
 {
 	return _rdrand16_step(Value);
 }
 
-int RDRAND32(unsigned int* Value)
+int RDRAND32(uint32_t* Value)
 {
 	return _rdrand32_step(Value);
 }
 
-int RDRAND64(unsigned long long* Value)
+#ifdef ENVIROMENT64
+int RDRAND64(uint64_t* Value)
 {
 	return _rdrand64_step(Value);
 }
+#endif
 
 namespace bpl
 {
@@ -44,17 +45,28 @@ namespace bpl
 
 		bool IvyRNG::operator()(uint16_t& Argument)
 		{
-			return Generate<unsigned short>(Argument, &RDRAND16);
+			return Generate<uint16_t>(Argument, &RDRAND16);
 		}
 
 		bool IvyRNG::operator()(uint32_t& Argument)
 		{
-			return Generate<unsigned int>(Argument, &RDRAND32);
+			return Generate<uint32_t>(Argument, &RDRAND32);
 		}
 
 		bool IvyRNG::operator()(uint64_t& Argument)
 		{
-			return Generate<unsigned long long>(Argument, &RDRAND64);
+#ifdef ENVIROMENT64
+			return Generate<uint64_t>(Argument, &RDRAND64);
+#else
+			bool Result = 1;
+			uint32_t Value1, Value2;
+
+			Result &= Generate<unsigned int>(Value1, &RDRAND32);
+			Result &= Generate<unsigned int>(Value2, &RDRAND32);
+			Argument = Value1 | static_cast<uint64_t>(Value2) << 32;
+
+			return Result;
+#endif
 		}
 
 		bool IvyRNG::SupportsRDRAND()
