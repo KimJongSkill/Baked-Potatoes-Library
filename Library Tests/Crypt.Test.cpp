@@ -72,12 +72,12 @@ namespace LibraryTests
 		{
 			auto Start = std::chrono::steady_clock::now();
 			for (int i = 0; i < 100000; ++i)
-				bpl::crypt::ConstantTimeEquals("1", "1", 2);
+				bpl::crypt::ConstantTimeEquals("111111", "111111", 7);
 			auto TrueAverage = std::chrono::steady_clock::now() - Start;
 
 			Start = std::chrono::steady_clock::now();
 			for (int i = 0; i < 100000; ++i)
-				bpl::crypt::ConstantTimeEquals("1", "1", 2);
+				bpl::crypt::ConstantTimeEquals("111111", "000000", 7);
 			auto FalseAverage = std::chrono::steady_clock::now() - Start;
 			
 			Assert::AreEqual(static_cast<double>(TrueAverage.count()), static_cast<double>(FalseAverage.count()), static_cast<double>(10)); // This may fail occasionally
