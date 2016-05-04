@@ -4,6 +4,7 @@
 #include "Hash.hpp"
 #include <array>
 #include <chrono>
+#include <cassert>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -105,14 +106,18 @@ namespace LibraryTests
 	{
 		std::array<uint8_t, 16> ToHex(const std::string& Array)
 		{
+			assert(Array.size() == 32);
+
 			const std::string LookUpTable = "0123456789abcdef";
 			std::array<uint8_t, 16> Result;
+
+			assert(Array.find_first_not_of(LookUpTable) == std::string::npos);
 	
 			std::size_t j = 0;
-			for (std::size_t i = 0; i < Array.length(); ++i)
+			for (std::size_t i = 0; i < Result.size(); ++i)
 			{
-				Result[j++] = LookUpTable[Array[i] >> 4];
-				Result[j++] = LookUpTable[Array[i] & 0xf];
+				Result[i] = (LookUpTable.find(Array[j++]) & 0xf) << 4;
+				Result[i] |= LookUpTable.find(Array[j++]);
 			}
 
 			return Result;
