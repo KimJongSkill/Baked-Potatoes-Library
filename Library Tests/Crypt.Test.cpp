@@ -100,4 +100,40 @@ namespace LibraryTests
 			Assert::AreEqual("56fa6aa75548099dcc37d7f03425e0c3", Function(std::string("pass\0word", 9), std::string("sa\0lt", 5), 4096, 16, false).c_str());
 		}
 	};
+
+	TEST_CLASS(AESTest)
+	{
+		std::array<uint8_t, 16> ToHex(const std::string& Array)
+		{
+			const std::string LookUpTable = "0123456789abcdef";
+			std::array<uint8_t, 16> Result;
+	
+			std::size_t j = 0;
+			for (std::size_t i = 0; i < Array.length(); ++i)
+			{
+				Result[j++] = LookUpTable[Array[i] >> 4];
+				Result[j++] = LookUpTable[Array[i] & 0xf];
+			}
+
+			return Result;
+		}
+
+		void RunTest(const std::string& EncryptionKey, const std::string& Plaintext, const std::string& Ciphertext)
+		{
+			bpl::crypt::AES<128> Context;
+			std::array<uint8_t, 16> Key = ToHex(EncryptionKey);
+			std::array<uint8_t, 16> Data = ToHex(Plaintext);
+			std::array<uint8_t, 16> Expected = ToHex(Ciphertext);
+
+			std::array<uint8_t, 16> Result = Context.EncryptBlock(Data, Key);
+
+			for (std::size_t i = 0; i < Ciphertext.size(); ++i)
+				Assert::AreEqual(Expected[i], Result[i]);
+		}
+
+		TEST_METHOD(AES128)
+		{
+			RunTest("000102030405060708090a0b0c0d0e0f", "00112233445566778899aabbccddeeff", "69c4e0d86a7b0430d8cdb78070b4c55a");
+		}
+	};
 }

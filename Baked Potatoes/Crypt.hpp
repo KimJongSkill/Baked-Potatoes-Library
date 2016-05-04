@@ -5,6 +5,7 @@
 #include <string>
 #include <functional>
 #include <vector>
+#include <array>
 #include "MAC.hpp"
 
 namespace bpl
@@ -104,5 +105,47 @@ namespace bpl
 			DerivedKey.resize(Length);
 			return RawOutput ? DerivedKey : bpl::utility::ToHex(DerivedKey);
 		}
+
+		/*
+			AES Class
+			KeySize is in bits. Valid values are 128, 192 and 256.
+		*/
+		template <std::size_t KeySize>
+		class AES
+		{
+			static const std::size_t KeyLength = KeySize / 32;
+			static const std::size_t BlockSize = 4;
+			static const std::size_t Rounds = KeyLength + 6;
+
+			static const uint8_t SBox[256];
+			static const uint8_t SBoxInverse[256];
+			static const uint8_t Rcon[11];
+			// http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf pg23 5.2 Key Expansion
+		
+		private:
+			// State[Rows][Columns]
+			std::array<std::uint8_t, 16> State;
+			std::array<std::uint32_t, BlockSize * (Rounds + 1)> ExpandedKey;
+			
+			std::uint8_t xtime(std::uint8_t Value) const;
+
+			void AddRoundKey(std::size_t Round);
+			/*void InvMixColumns();
+			void InvShiftRows();	After we get encryption to compile
+			void InvSubBytes();*/
+			void MixColumns();
+			std::uint32_t RotWord(std::uint32_t Word) const;
+			void ShiftRows();
+			void SubBytes();
+			std::uint32_t SubWord(std::uint32_t Word) const;
+
+			void KeyExpansion(const std::array<uint8_t, KeySize / 8>& Key);
+
+			void InitializeState(const std::array<uint8_t, 16>& Input);
+			std::array<uint8_t, 16> StateToOutput() const;
+
+		public:
+			std::array<uint8_t, 16> EncryptBlock(const std::array<uint8_t, 16>& Plaintext, const std::array<uint8_t, KeySize / 8>& Key);
+		};
 	}
 }
