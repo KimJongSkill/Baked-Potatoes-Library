@@ -77,7 +77,7 @@ namespace bpl
 		{
 			bpl::crypt::MAC::HMAC<Hash> Function;
 			std::string DerivedKey;
-			
+
 			if (Length > (std::pow(2, 32) - 1) * Function.DigestSize())
 				throw std::out_of_range("Derived key too long");
 
@@ -85,14 +85,14 @@ namespace bpl
 			{
 				union { std::uint32_t Int; std::uint8_t Array[4]; } BigEndian;
 				BigEndian.Int = bpl::utility::BigEndian32(i);
-				
+
 				std::string Buffer = Salt;
 				for (std::size_t j = 0; j < sizeof(BigEndian); ++j)
 					Buffer.push_back(BigEndian.Array[j]);
 				std::string CurrentKey = Function(Password, Buffer, true);
 				Buffer = CurrentKey;
 
-				for (std::size_t j = 1; j < Cost; ++j) 
+				for (std::size_t j = 1; j < Cost; ++j)
 				{
 					Buffer = Function(Password, Buffer, true);
 					std::transform(CurrentKey.begin(), CurrentKey.end(), Buffer.begin(), CurrentKey.begin(), [](std::uint8_t x, std::uint8_t y) { return x ^ y; });
@@ -100,7 +100,7 @@ namespace bpl
 
 				DerivedKey += CurrentKey;
 			}
-			
+
 			DerivedKey.resize(Length);
 			return RawOutput ? DerivedKey : bpl::utility::ToHex(DerivedKey);
 		}

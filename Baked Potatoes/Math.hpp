@@ -57,7 +57,7 @@ namespace bpl
 		};
 
 		template <>
-		struct Harmonic < 0 >
+		struct Harmonic<0>
 		{
 			fmath_t static const value;
 		};
