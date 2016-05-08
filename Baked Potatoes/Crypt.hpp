@@ -113,16 +113,17 @@ namespace bpl
 		template <std::size_t KeySize>
 		class AES
 		{
+		public:
 			static const std::size_t KeyLength = KeySize / 32;
 			static const std::size_t BlockSize = 4;
 			static const std::size_t Rounds = KeyLength + 6;
 
+		private:
 			static const uint8_t SBox[256];
 			static const uint8_t SBoxInverse[256];
 			static const uint8_t Rcon[11];
 			// http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf pg23 5.2 Key Expansion
-		
-		private:
+
 			std::array<std::uint8_t, 16> State;
 			std::array<std::uint32_t, BlockSize * (Rounds + 1)> ExpandedKey;
 			
