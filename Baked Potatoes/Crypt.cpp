@@ -246,29 +246,9 @@ namespace bpl
 		}
 
 		template <std::size_t KeySize>
-		inline void AES<KeySize>::InitializeState(const std::array<uint8_t, 16>& Input)
-		{
-			/*for (std::size_t r = 0; r < 4; ++r)
-				for (std::size_t c = 0; c < 4; ++c)
-				State[r][c] = Input[r + 4 * c];*/
-			std::copy(Input.cbegin(), Input.cend(), State.begin());
-		}
-
-		template <std::size_t KeySize>
-		inline std::array<uint8_t, 16> AES<KeySize>::StateToOutput() const
-		{
-			std::array<uint8_t, 16> Output;
-			/*for (std::size_t r = 0; r < 4; ++r)
-				for (std::size_t c = 0; c < 4; ++c)
-				Output[r + 4 * c] = State[r][c];*/
-			std::copy(State.cbegin(), State.cend(), Output.begin());
-			return Output;
-		}
-
-		template <std::size_t KeySize>
 		std::array<uint8_t, 16> AES<KeySize>::EncryptBlock(const std::array<uint8_t, 16>& Plaintext, const std::array<uint8_t, KeySize / 8>& Key)
 		{
-			InitializeState(Plaintext);
+			std::copy(Plaintext.cbegin(), Plaintext.cend(), State.begin());
 
 			KeyExpansion(Key);
 
@@ -286,7 +266,7 @@ namespace bpl
 			ShiftRows();
 			AddRoundKey(Rounds);
 
-			return StateToOutput();
+			return State;
 		}
 		
 		template <std::size_t KeySize>

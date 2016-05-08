@@ -141,9 +141,6 @@ namespace bpl
 
 			void KeyExpansion(const std::array<uint8_t, KeySize / 8>& Key);
 
-			void InitializeState(const std::array<uint8_t, 16>& Input);
-			std::array<uint8_t, 16> StateToOutput() const;
-
 		public:
 			std::array<uint8_t, 16> EncryptBlock(const std::array<uint8_t, 16>& Plaintext, const std::array<uint8_t, KeySize / 8>& Key);
 		};
