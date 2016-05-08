@@ -131,10 +131,14 @@ namespace bpl
 		}
 
 		template <std::size_t KeySize>
-		inline std::uint8_t AES<KeySize>::xtime(std::uint8_t Value) const
+		std::uint8_t AES<KeySize>::xtime(std::size_t Index) const
 		{
-			Value <<= 1;
-			return Value & 0x80 ? Value ^ 0x1b : Value;
+			std::uint8_t Value = State[Index] << 1;
+
+			if (State[Index] & 0x80)
+				Value ^= 0x1b;
+
+			return Value;
 		}
 
 		template <std::size_t KeySize>
@@ -155,35 +159,14 @@ namespace bpl
 			*	- when we have a 0x3 we do both, since 0x1 & 0x2 = 0x3
 			*/
 
-			std::array<std::uint8_t, 4> NewColumn;
-
 			for (std::size_t i = 0; i < 16; i += 4)
 			{
-				//NewColumn[0] = xtime(State[i]) ^ (xtime(State[i + 1]) ^ State[i + 1]) ^ State[i + 2] ^ State[i + 3]; // Works
-				//NewColumn[1] = State[i] ^ xtime(State[i + 1]) ^ (xtime(State[i + 2]) ^ State[i + 2]) ^ State[i + 3]; // Doesn't work
-				//NewColumn[2] = State[i] ^ State[i + 1] ^ xtime(State[i + 2]) ^ (xtime(State[i + 3]) ^ State[i + 3]); // Also doesn't work
-				//NewColumn[3] = (xtime(State[i]) ^ State[i]) ^ State[i + 1] ^ State[i + 2] ^ xtime(State[i + 3]); // But this one works?
-				
-				unsigned char a[4];
-				unsigned char b[4];
-				unsigned char c;
-				unsigned char h;
-				/* 
-				*	The array 'a' is simply a copy of the input array 'r'.
-				*	The array 'b' is each element of the array 'a' multiplied by 2 in Rijndael's Galois field.
-				*	a[n] ^ b[n] is element n multiplied by 3 in Rijndael's Galois field.
-				*/
-				for (c = 0; c < 4; c++) {
-					a[c] = State[i + c];
-					// h is 0xff if the high bit of r[c] is set, 0 otherwise
-					h = (unsigned char)((signed char)a[c] >> 7); // arithmetic right shift, thus shifting in either zeros or ones
-					b[c] = a[c] << 1; // implicitly removes high bit because b[c] is an 8-bit char, so we xor by 0x1b and not 0x11b in the next line
-					b[c] ^= 0x1B & h; // Rijndael's Galois field
-				}
-				NewColumn[0] = b[0] ^ a[3] ^ a[2] ^ b[1] ^ a[1]; // 2 * a0 + a3 + a2 + 3 * a1
-				NewColumn[1] = b[1] ^ a[0] ^ a[3] ^ b[2] ^ a[2]; // 2 * a1 + a0 + a3 + 3 * a2
-				NewColumn[2] = b[2] ^ a[1] ^ a[0] ^ b[3] ^ a[3]; // 2 * a2 + a1 + a0 + 3 * a3
-				NewColumn[3] = b[3] ^ a[2] ^ a[1] ^ b[0] ^ a[0]; // 2 * a3 + a2 + a1 + 3 * a0
+				std::array<std::uint8_t, 4> NewColumn;
+
+				NewColumn[0] = xtime(i + 0) ^ State[i + 3] ^ State[i + 2] ^ xtime(i + 1) ^ State[i + 1];
+				NewColumn[1] = xtime(i + 1) ^ State[i + 0] ^ State[i + 3] ^ xtime(i + 2) ^ State[i + 2];
+				NewColumn[2] = xtime(i + 2) ^ State[i + 1] ^ State[i + 0] ^ xtime(i + 3) ^ State[i + 3];
+				NewColumn[3] = xtime(i + 3) ^ State[i + 2] ^ State[i + 1] ^ xtime(i + 0) ^ State[i + 0];
 
 				std::copy(NewColumn.cbegin(), NewColumn.cend(), State.begin() + i);
 			} 

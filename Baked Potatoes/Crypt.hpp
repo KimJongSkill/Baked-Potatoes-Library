@@ -127,7 +127,7 @@ namespace bpl
 			std::array<std::uint8_t, 16> State;
 			std::array<std::uint32_t, BlockSize * (Rounds + 1)> ExpandedKey;
 			
-			std::uint8_t xtime(std::uint8_t Value) const;
+			std::uint8_t xtime(std::size_t Index) const;
 
 			void AddRoundKey(std::size_t Round);
 			/*void InvMixColumns();
