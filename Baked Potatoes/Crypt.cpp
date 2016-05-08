@@ -228,9 +228,7 @@ namespace bpl
 		{
 			//std::copy(Key.cbegin(), Key.cend(), reinterpret_cast<std::uint8_t*>(ExpandedKey.data()));
 			for (std::size_t i = 0; i < Key.size(); i += 4)
-			{
-				ExpandedKey[i / 4] = (Key[i] << 24) ^ (Key[i + 1] << 16) ^ (Key[i + 2] << 8) ^ Key[i + 3];
-			}
+				ExpandedKey[i / 4] = (Key[i] << 24) | (Key[i + 1] << 16) | (Key[i + 2] << 8) | Key[i + 3];
 
 			std::uint32_t Temp;
 			for (std::size_t i = KeyLength; i < BlockSize * (Rounds + 1); ++i)
