@@ -132,7 +132,7 @@ namespace LibraryTests
 
 			std::array<uint8_t, 16> Result = Context.EncryptBlock(Data, Key);
 
-			for (std::size_t i = 0; i < Ciphertext.size(); ++i)
+			for (std::size_t i = 0; i < Expected.size(); ++i)
 				Assert::AreEqual(Expected[i], Result[i]);
 		}
 
