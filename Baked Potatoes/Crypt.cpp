@@ -210,7 +210,7 @@ namespace bpl
 		{
 			auto Pointer = reinterpret_cast<uint8_t*>(&Word);
 
-			for (std::size_t i = 0; i < 4; ++i)
+			for (std::size_t i = 0; i < sizeof(Word); ++i)
 			{
 				//std::size_t Row = *Pointer >> 4;
 				//std::size_t Column = *Pointer & 0x0f;
