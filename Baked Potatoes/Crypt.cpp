@@ -212,10 +212,6 @@ namespace bpl
 
 			for (std::size_t i = 0; i < sizeof(Word); ++i)
 			{
-				//std::size_t Row = *Pointer >> 4;
-				//std::size_t Column = *Pointer & 0x0f;
-
-				//*Pointer++ = SBox[Row * 0xf + Column];
 				*Pointer = SBox[*Pointer];
 				++Pointer;
 			}
@@ -226,7 +222,6 @@ namespace bpl
 		template <std::size_t KeySize>
 		void AES<KeySize>::KeyExpansion(const std::array<uint8_t, KeySize / 8>& Key)
 		{
-			//std::copy(Key.cbegin(), Key.cend(), reinterpret_cast<std::uint8_t*>(ExpandedKey.data()));
 			for (std::size_t i = 0; i < Key.size(); i += 4)
 				ExpandedKey[i / 4] = (Key[i] << 24) | (Key[i + 1] << 16) | (Key[i + 2] << 8) | Key[i + 3];
 

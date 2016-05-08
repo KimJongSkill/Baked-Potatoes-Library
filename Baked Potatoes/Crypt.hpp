@@ -107,8 +107,8 @@ namespace bpl
 		}
 
 		/*
-			AES Class
-			KeySize is in bits. Valid values are 128, 192 and 256.
+		*	AES Class
+		*	KeySize is in bits. Valid values are 128, 192 and 256.
 		*/
 		template <std::size_t KeySize>
 		class AES
@@ -123,7 +123,6 @@ namespace bpl
 			// http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf pg23 5.2 Key Expansion
 		
 		private:
-			// State[Rows][Columns]
 			std::array<std::uint8_t, 16> State;
 			std::array<std::uint32_t, BlockSize * (Rounds + 1)> ExpandedKey;
 			
