@@ -104,12 +104,13 @@ namespace LibraryTests
 
 	TEST_CLASS(AESTest)
 	{
-		std::array<uint8_t, 16> ToHex(const std::string& Array)
+		template <std::size_t Length>
+		std::array<uint8_t, Length> ToHex(const std::string& Array)
 		{
-			assert(Array.size() == 32);
+			assert(Array.size() == Length * 2);
 
 			const std::string LookUpTable = "0123456789abcdef";
-			std::array<uint8_t, 16> Result;
+			std::array<uint8_t, Length> Result;
 
 			assert(Array.find_first_not_of(LookUpTable) == std::string::npos);
 	
@@ -123,12 +124,13 @@ namespace LibraryTests
 			return Result;
 		}
 
+		template <std::size_t KeySize>
 		void RunTest(const std::string& EncryptionKey, const std::string& Plaintext, const std::string& Ciphertext)
 		{
-			bpl::crypt::AES<128> Context;
-			std::array<uint8_t, 16> Key = ToHex(EncryptionKey);
-			std::array<uint8_t, 16> Data = ToHex(Plaintext);
-			std::array<uint8_t, 16> Expected = ToHex(Ciphertext);
+			bpl::crypt::AES<KeySize> Context;
+			std::array<uint8_t, KeySize / 8> Key = ToHex<KeySize / 8>(EncryptionKey);
+			std::array<uint8_t, 16> Data = ToHex<16>(Plaintext);
+			std::array<uint8_t, 16> Expected = ToHex<16>(Ciphertext);
 
 			std::array<uint8_t, 16> Result = Context.EncryptBlock(Data, Key);
 
@@ -136,9 +138,15 @@ namespace LibraryTests
 				Assert::AreEqual(Expected[i], Result[i]);
 		}
 
-		TEST_METHOD(AES128)
+		TEST_METHOD(AES)
 		{
-			RunTest("000102030405060708090a0b0c0d0e0f", "00112233445566778899aabbccddeeff", "69c4e0d86a7b0430d8cdb78070b4c55a");
+			/*
+			*	http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
+			*	Appendix C
+			*/
+			RunTest<128>("000102030405060708090a0b0c0d0e0f", "00112233445566778899aabbccddeeff", "69c4e0d86a7b0430d8cdb78070b4c55a");
+			RunTest<192>("000102030405060708090a0b0c0d0e0f1011121314151617", "00112233445566778899aabbccddeeff", "dda97ca4864cdfe06eaf70a0ec0d7191");
+			RunTest<256>("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", "00112233445566778899aabbccddeeff", "8ea2b7ca516745bfeafc49904b496089");
 		}
 	};
 }
